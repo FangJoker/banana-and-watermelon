@@ -5,12 +5,12 @@ img = cv2.imread('D:/pip/xiangjiao/1517974165.9889214.jpg')
 h = np.zeros((300,300,3),np.uint8)  #作为折线输入图  全0图像    
          
 bins = np.arange(300).reshape(300,1) #直方图中各bin的顶点位置   (生成一个256行1列的数组) 
-color = [ (299,0,0),(0,299,0),(0,0,299) ] #BGR三种颜色    
+color = [ (255,0,0),(0,255,0),(0,0,255) ] #BGR三种颜色    
 #对三个通道都遍历一遍（枚举3个通道）
 
 for ch, col in enumerate(color):    
     #计算ch通道直方图
-    originHist = cv2.calcHist([img],[ch],None,[300],[0,300]) 
+    originHist = cv2.calcHist([img],[ch],None,[256],[0,256]) 
     #Opencv2的归一化函数normalize()，使得直方图的范围限定在0-255×0.9之间
     #void normalize(InputArray src,OutputArray dst, double alpha=1, doublebeta=0, int norm_type=NORM_L2, int dtype=-1, InputArray mask=noArray() )
     #src  输入数组   dst 输出数组，支持原地运算
@@ -19,7 +19,7 @@ for ch, col in enumerate(color):
     #NORM_INF: 此类型的定义没有查到，根据Opencv2 1的对应项，可能是归一化数组的C-范数(绝对值的最大值)
     #NORM_L1 :  归一化数组的L1-范数(绝对值的和)
     #NORM_L2: 归一化数组的(欧几里德)L2-范数
-    cv2.normalize(originHist, originHist,0,299*0.9,cv2.NORM_MINMAX)
+    cv2.normalize(originHist, originHist,0,255*0.9,cv2.NORM_MINMAX)
     #使用around对矩阵中每一个元素取整（四舍五入）
     #因为calcHist函数返回的是float32类型的数组所以将整数部分转成np.int32类型。 例如66.666->66.0->66
     #注意：Python的int(...)只能转换一个元素。这里是很多个元素，numpy的转换函数可以对数组中的每个元素都进行转换
