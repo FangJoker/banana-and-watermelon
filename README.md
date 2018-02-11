@@ -41,6 +41,9 @@ Beautiful Soup 是一个可以从HTML或XML文件中提取数据的Python库，�
 ![](https://i.imgur.com/6rhx77z.png)
 **值得一提的是，python存文件如果所写路径不存在会报错，不会说新建一个文件夹**
 ## 计算图形直方图 ##
+**图像直方图是用以表示数字图像中亮度分布的直方图，标绘了图像中每个亮度值的像素数，可以借助观察该直方图了解需要如何调整亮度分布。**<br>
+**计算机通常将图像表示为RGB值，或者再加上alpha值（通透度，透明度），称为RGBA值。在Pillow中，RGBA的值表示为由4个整数组成的元组，分别是R、G、B、A。整数的范围0~255。RGB全0就可以表示黑色，全255代表黑色。(255, 0, 0, 255)代表红色**
+
 ### 分离R G B（red green blue）三通道 ###
 
 	import cv2  
@@ -49,7 +52,6 @@ Beautiful Soup 是一个可以从HTML或XML文件中提取数据的Python库，�
 	
 	
 	'''计算每个通道直方图'''
-	'''图像直方图是用以表示数字图像中亮度分布的直方图，标绘了图像中每个亮度值的像素数，可以借助观察该直方图了解需要如何调整亮度分布'''
 	def calcAndDrawHist(image, color):
 	    '''hist = cv2.calcHist([image],  
 	     img必须用[]括起来
@@ -57,20 +59,20 @@ Beautiful Soup 是一个可以从HTML或XML文件中提取数据的Python库，�
 	     None, #没有使用mask  
 	    [256], #HistSize  表示这个直方图分成多少份（即多少个直方柱）
 	    [0.0,255.0]) #直方图柱的范围      '''
-	    hist= cv2.calcHist([image], [0], None, [300], [0.0,255.0])    
+	    hist= cv2.calcHist([image], [0], None, [256], [0.0,255.0])    
 	    '''minMaxLoc寻找矩阵(一维数组当作向量,用Mat定义) 中最小值和最大值的位置'''
 	    minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(hist)    #结果为 (0.0, 17288.0, (0, 0), (0, 1))
 	    '''np.zeros();返回来一个给定形状和类型的用0填充的数组； eg: np.zeros(5)->array([ 0.,  0.,  0.,  0.,  0.])
 	    zeros(shape, dtype=float, order='C') shape:形状  dtype:数据类型，可选参数，默认numpy.float64   order:可选参数，c代表与c语言类似，行优先；F代表列优先'''
-	    histImg = np.zeros([300,300,3], np.uint8)  #300 个 300行 3列
-	    hpt = int(0.9* 300)
+	    histImg = np.zeros([256,256,3], np.uint8)  #300 个 300行 3列
+	    hpt = int(0.9* 256)
 	       
 	    
 	    for h in range(300):  
 	        '''计算直方图的每个点的值 '''
 	        intensity = int(hist[h]*hpt/maxVal)
 	        '''绘制直线'''
-	        cv2.line(histImg,(h,300), (h,300-intensity), color) 
+	        cv2.line(histImg,(h,256), (h,256-intensity), color) 
 	        '''void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 	        img: 要绘制线段的图像。
 			pt1: 线段的起点。
@@ -111,14 +113,14 @@ Beautiful Soup 是一个可以从HTML或XML文件中提取数据的Python库，�
 	 '''作为折线输入图  全0图像  '''  
 	h = np.zeros((300,300,3),np.uint8) 
 	'''直方图中各bin的顶点位置   (生成一个256行1列的数组) '''        
-	bins = np.arange(300).reshape(300,1) 
+	bins = np.arange(256).reshape(256,1) 
 	'''BGR三种颜色'''    
-	color = [ (299,0,0),(0,299,0),(0,0,299) ] 
+	color = [ (255,0,0),(0,255,0),(0,0,255) ] 
 	
 	'''对三个通道都遍历一遍（枚举3个通道）'''
 	for ch, col in enumerate(color):    
 	    '''计算ch通道直方图'''
-	    originHist = cv2.calcHist([img],[ch],None,[300],[0,300]) 
+	    originHist = cv2.calcHist([img],[ch],None,[256],[0,256]) 
 	    '''Opencv2的归一化函数normalize()，使得直方图的范围限定在0-255×0.9之间
 	    void normalize(InputArray src,OutputArray dst, double alpha=1, doublebeta=0, int norm_type=NORM_L2, int dtype=-1, InputArray mask=noArray() )
 	    src  输入数组   dst 输出数组，支持原地运算
@@ -128,7 +130,7 @@ Beautiful Soup 是一个可以从HTML或XML文件中提取数据的Python库，�
 	    NORM_L1 :  归一化数组的L1-范数(绝对值的和)
 	    NORM_L2: 归一化数组的(欧几里德)L2-范数
 	    '''
-	    cv2.normalize(originHist, originHist,0,299*0.9,cv2.NORM_MINMAX)
+	    cv2.normalize(originHist, originHist,0,255*0.9,cv2.NORM_MINMAX)
 	    '''使用around对矩阵中每一个元素取整（四舍五入）
 	    因为calcHist函数返回的是float32类型的数组所以将整数部分转成np.int32类型。 例如66.666->66.0->66
 	    注意：Python的int(...)只能转换一个元素。这里是很多个元素，numpy的转换函数可以对数组中的每个元素都进行转换
